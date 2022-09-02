@@ -223,6 +223,9 @@
           <sonar.host.url>
             http://sonarqube.cicd-tools.svc.cluster.local:9000
           </sonar.host.url>
+          <sonar.dependencyCheck.jsonReportPath>
+            target/dependency-check-report.json
+          </sonar.dependencyCheck.jsonReportPath>
       </properties>
     </profile>
     <profile>
