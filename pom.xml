@@ -113,11 +113,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonarsource.scanner.maven</groupId>
-        <artifactId>sonar-maven-plugin</artifactId>
-        <version>3.9.1.2184</version>
-      </plugin>
-      <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.platform.version}</version>
@@ -186,6 +181,44 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+              <plugins>
+                <plugin>
+                  <groupId>org.sonarsource.scanner.maven</groupId>
+                  <artifactId>sonar-maven-plugin</artifactId>
+                  <version>3.9.1.2184</version>
+                </plugin>
+                <plugin>
+                  <groupId>org.owasp</groupId>
+                  <artifactId>dependency-check-maven</artifactId>
+                  <version>7.1.2</version>
+                  <configuration>
+                    <format>JSON</format>
+                  </configuration>
+                  <executions>
+                    <execution>
+                      <goals>
+                        <goal>check</goal>
+                      </goals>
+                    </execution>
+                  </executions>
+                </plugin>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-pmd-plugin</artifactId>
+                  <version>3.18.0</version>
+                  <executions>
+                    <execution>
+                      <id>validate</id>
+                      <phase>validate</phase>
+                      <goals>
+                        <goal>pmd</goal>
+                      </goals>
+                    </execution>
+                  </executions>
+                </plugin>
+              </plugins>
+            </build>
             <properties>
                 <!-- Optional URL to server. Default value is http://localhost:9000 -->
                 <sonar.host.url>
