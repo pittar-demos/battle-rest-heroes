@@ -36,18 +36,21 @@ quarkus:
   swagger-ui:
     always-include: true
 
+
 "%dev":
   quarkus:
+    hibernate-orm:
+      sql-load-script: import.sql
+    datasource:
+      url: postgresql://localhost:5432/heroes_database
+      username: postgres
+      password: superman
+      reactive:
+        url: postgresql://localhost:5432/heroes_database
     log:
       console:
         format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
         level: DEBUG
-    datasource:
-      url: postgresql://localhost:5432/heroes_database
-      username: superman
-      password: superman
-      reactive:
-        url: postgresql://localhost:5432/heroes_database
 
 "%test":
   quarkus:

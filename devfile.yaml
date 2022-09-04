@@ -65,6 +65,8 @@ components:
           value: superman
         - name: POSTGRESQL_DATABASE
           value: heroes_database
+        - name: POSTGRESQL_ADMIN_PASSWORD
+          value: superman
       endpoints:
         - exposure: none
           name: heroesdb
