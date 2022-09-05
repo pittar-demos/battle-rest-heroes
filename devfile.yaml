@@ -2,10 +2,16 @@ schemaVersion: 2.1.0
 metadata:
   name: battle-rest-heroes
 projects:
-  - name: battle-rest-heroess
+  - name: battle-rest-heroes
     git:
       remotes:
         origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-heroes.git"
+      checkoutFrom:
+        revision: main
+  - name: battle-rest-villains
+    git:
+      remotes:
+        origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-villains.git"
       checkoutFrom:
         revision: main
 components:
@@ -34,6 +40,11 @@ components:
           path: /
           protocol: http
           targetPort: 8081
+        - exposure: public
+          name: villains-endpoint
+          path: /
+          protocol: http
+          targetPort: 8082
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -60,13 +71,13 @@ components:
       image: registry.redhat.io/rhel9/postgresql-13
       env:
         - name: POSTGRESQL_USER
-          value: superman
+          value: battle
         - name: POSTGRESQL_PASSWORD
-          value: superman
+          value: battle
         - name: POSTGRESQL_DATABASE
-          value: heroes_database
+          value: battledb
         - name: POSTGRESQL_ADMIN_PASSWORD
-          value: superman
+          value: battle
       endpoints:
         - exposure: none
           name: heroesdb
@@ -83,8 +94,8 @@ commands:
       group:
         isDefault: true
         kind: build
-      workingDir: '${PROJECTS_ROOT}/battle-rest-heroess'
-    id: 1-package
+      workingDir: '${PROJECTS_ROOT}/battle-rest-heroes'
+    id: 1-package-heroes
   - exec:
       commandLine: 'mvn compile quarkus:dev -DskipTests'
       component: tools
@@ -92,5 +103,22 @@ commands:
         isDefault: true
         kind: run
       label: Start Development mode (Hot reload + debug)
-      workingDir: '${PROJECTS_ROOT}/battle-rest-heroess'
-    id: 2-startdev
+      workingDir: '${PROJECTS_ROOT}/battle-rest-heroes'
+    id: 2-startdev-heroes
+  - exec:
+      commandLine: mvn package -DskipTests
+      component: tools
+      group:
+        isDefault: true
+        kind: build
+      workingDir: '${PROJECTS_ROOT}/battle-rest-villains'
+    id: 1-package-villains
+  - exec:
+      commandLine: 'mvn compile quarkus:dev -DskipTests'
+      component: tools
+      group:
+        isDefault: true
+        kind: run
+      label: Start Development mode (Hot reload + debug)
+      workingDir: '${PROJECTS_ROOT}/battle-rest-villains'
+    id: 2-startdev-villains
