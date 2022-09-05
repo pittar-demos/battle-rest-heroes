@@ -14,6 +14,12 @@ projects:
         origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-villains.git"
       checkoutFrom:
         revision: main
+  - name: battle-rest-fights
+    git:
+      remotes:
+        origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-fights.git"
+      checkoutFrom:
+        revision: main
 components:
   - attributes:
       app.kubernetes.io/name: tools
@@ -45,6 +51,11 @@ components:
           path: /
           protocol: http
           targetPort: 8082
+        - exposure: public
+          name: fights-endpoint
+          path: /
+          protocol: http
+          targetPort: 8085
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -122,3 +133,20 @@ commands:
       label: Start Development mode (Hot reload + debug)
       workingDir: '${PROJECTS_ROOT}/battle-rest-villains'
     id: 2-startdev-villains
+  - exec:
+      commandLine: mvn package -DskipTests
+      component: tools
+      group:
+        isDefault: true
+        kind: build
+      workingDir: '${PROJECTS_ROOT}/battle-rest-fights'
+    id: 1-package-fights
+  - exec:
+      commandLine: 'mvn compile quarkus:dev -DskipTests'
+      component: tools
+      group:
+        isDefault: true
+        kind: run
+      label: Start Development mode (Hot reload + debug)
+      workingDir: '${PROJECTS_ROOT}/battle-rest-fights'
+    id: 2-startdev-fights
