@@ -94,7 +94,59 @@ components:
           name: heroesdb
           protocol: tcp
           targetPort: 5432
-      memoryLimit: 1G
+      memoryLimit: 256G
+  - name: fightsdb
+    container:
+      image: bitnami/mongodb:5.0
+      env:
+        - name: MONGODB_DATABASE
+          value: battledb
+        - name: MONGODB_USERNAME
+          value: battle
+        - name: MONGODB_PASSWORD
+          value: battledb
+        - name: MONGODB_ROOT_USER
+          value: battle
+        - name: MONGODB_ROOT_PASSWORD
+          value: battle
+      endpoints:
+        - exposure: none
+          name: fightsdb
+          protocol: tcp
+          targetPort: 27017
+      memoryLimit: 256Mi
+  - name: kafka
+    container:
+      image: quay.io/strimzi/kafka:0.28.0-kafka-3.1.0
+      env:
+        - name: LOG_DIR
+          value: /tmp/logs
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://localhost:9092
+      command:
+        - sh
+        - -c
+        - "export CLUSTER_ID=$(bin/kafka-storage.sh random-uuid) && bin/kafka-storage.sh\
+          \ format -t ${CLUSTER_ID} -c config/kraft/server.properties && bin/kafka-server-start.sh\
+          \ config/kraft/server.properties --override advertised.listeners=${KAFKA_ADVERTISED_LISTENERS}"
+      endpoints:
+        - exposure: none
+          name: kafka
+          protocol: tcp
+          targetPort: 9092
+      memoryLimit: 768Mi
+  - name: apicurio
+    container:
+      image: quay.io/apicurio/apicurio-registry-mem:2.2.3.Final
+      env:
+        - name: REGISTRY_AUTH_ANONYMOUS_READ_ACCESS_ENABLED
+          value: "true"
+      endpoints:
+        - exposure: none
+          name: apicurio
+          protocol: tcp
+          targetPort: 8080
+      memoryLimit: 768G
   - name: m2
     volume:
       size: 1G
