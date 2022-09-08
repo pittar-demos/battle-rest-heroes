@@ -8,18 +8,6 @@ projects:
         origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-heroes.git"
       checkoutFrom:
         revision: main
-  - name: battle-rest-villains
-    git:
-      remotes:
-        origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-villains.git"
-      checkoutFrom:
-        revision: main
-  - name: battle-rest-fights
-    git:
-      remotes:
-        origin: "http://gitea.scm.svc.cluster.local:3000/developer/battle-rest-fights.git"
-      checkoutFrom:
-        revision: main
 components:
   - attributes:
       app.kubernetes.io/name: tools
@@ -46,16 +34,6 @@ components:
           path: /
           protocol: http
           targetPort: 8081
-        - exposure: public
-          name: villains-endpoint
-          path: /
-          protocol: http
-          targetPort: 8082
-        - exposure: public
-          name: fights-endpoint
-          path: /
-          protocol: http
-          targetPort: 8085
       env:
         - name: QUARKUS_HTTP_HOST
           value: 0.0.0.0
@@ -66,7 +44,7 @@ components:
         - name: CHE_PLUGIN_REGISTRY_INTERNAL_URL
           value: 'http://plugin-registry.openshift-devspaces.svc:8080/v3'
       image: 'registry.redhat.io/devspaces/udi-rhel8@sha256:d55549aad15742f6f7310da0c7abc1e65dd5d3ad2e3efb8fbf414cf91b9efac7'
-      memoryLimit: 4G
+      memoryLimit: 2G
       mountSources: true
       sourceMapping: /projects
       volumeMounts:
@@ -95,58 +73,6 @@ components:
           protocol: tcp
           targetPort: 5432
       memoryLimit: 256G
-  - name: fightsdb
-    container:
-      image: bitnami/mongodb:5.0
-      env:
-        - name: MONGODB_DATABASE
-          value: battledb
-        - name: MONGODB_USERNAME
-          value: battle
-        - name: MONGODB_PASSWORD
-          value: battledb
-        - name: MONGODB_ROOT_USER
-          value: battle
-        - name: MONGODB_ROOT_PASSWORD
-          value: battle
-      endpoints:
-        - exposure: none
-          name: fightsdb
-          protocol: tcp
-          targetPort: 27017
-      memoryLimit: 256Mi
-  - name: kafka
-    container:
-      image: quay.io/strimzi/kafka:0.28.0-kafka-3.1.0
-      env:
-        - name: LOG_DIR
-          value: /tmp/logs
-        - name: KAFKA_ADVERTISED_LISTENERS
-          value: PLAINTEXT://localhost:9092
-      command:
-        - sh
-        - -c
-        - "export CLUSTER_ID=$(bin/kafka-storage.sh random-uuid) && bin/kafka-storage.sh\
-          \ format -t ${CLUSTER_ID} -c config/kraft/server.properties && bin/kafka-server-start.sh\
-          \ config/kraft/server.properties --override advertised.listeners=${KAFKA_ADVERTISED_LISTENERS}"
-      endpoints:
-        - exposure: none
-          name: kafka
-          protocol: tcp
-          targetPort: 9092
-      memoryLimit: 768Mi
-  - name: apicurio
-    container:
-      image: quay.io/apicurio/apicurio-registry-mem:2.2.3.Final
-      env:
-        - name: REGISTRY_AUTH_ANONYMOUS_READ_ACCESS_ENABLED
-          value: "true"
-      endpoints:
-        - exposure: none
-          name: apicurio
-          protocol: tcp
-          targetPort: 8080
-      memoryLimit: 768G
   - name: m2
     volume:
       size: 1G
@@ -168,37 +94,3 @@ commands:
       label: Start Development mode (Hot reload + debug)
       workingDir: '${PROJECTS_ROOT}/battle-rest-heroes'
     id: 2-startdev-heroes
-  - exec:
-      commandLine: mvn package -DskipTests
-      component: tools
-      group:
-        isDefault: true
-        kind: build
-      workingDir: '${PROJECTS_ROOT}/battle-rest-villains'
-    id: 1-package-villains
-  - exec:
-      commandLine: 'mvn compile quarkus:dev -DskipTests'
-      component: tools
-      group:
-        isDefault: true
-        kind: run
-      label: Start Development mode (Hot reload + debug)
-      workingDir: '${PROJECTS_ROOT}/battle-rest-villains'
-    id: 2-startdev-villains
-  - exec:
-      commandLine: mvn package -DskipTests
-      component: tools
-      group:
-        isDefault: true
-        kind: build
-      workingDir: '${PROJECTS_ROOT}/battle-rest-fights'
-    id: 1-package-fights
-  - exec:
-      commandLine: 'mvn compile quarkus:dev -DskipTests'
-      component: tools
-      group:
-        isDefault: true
-        kind: run
-      label: Start Development mode (Hot reload + debug)
-      workingDir: '${PROJECTS_ROOT}/battle-rest-fights'
-    id: 2-startdev-fights
