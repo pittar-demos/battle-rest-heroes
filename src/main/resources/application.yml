@@ -1,3 +1,5 @@
+application:
+  runtime: quarkus
 quarkus:
   application:
     name: rest-heroes
