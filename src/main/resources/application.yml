@@ -44,11 +44,11 @@ quarkus:
     hibernate-orm:
       sql-load-script: import.sql
     datasource:
-      url: postgresql://localhost:5432/heroes_database
-      username: postgres
-      password: superman
+      url: postgresql://localhost:5432/battledb
+      username: battle
+      password: battle
       reactive:
-        url: postgresql://localhost:5432/heroes_database
+        url: postgresql://localhost:5432/battledb
     log:
       console:
         format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
