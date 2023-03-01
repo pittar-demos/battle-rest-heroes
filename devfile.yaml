@@ -68,7 +68,7 @@ components:
           name: battledb
           protocol: tcp
           targetPort: 5432
-      memoryLimit: 256G
+      memoryLimit: 256Mi
   - name: m2
     volume:
       size: 1G
